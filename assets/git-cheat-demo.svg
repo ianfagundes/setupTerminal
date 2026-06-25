@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="360" viewBox="0 0 780 360" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="14">
+  <!-- janela -->
+  <rect x="0" y="0" width="780" height="360" rx="10" fill="#1e1e2e"/>
+  <rect x="0" y="0" width="780" height="34" rx="10" fill="#313244"/>
+  <rect x="0" y="22" width="780" height="12" fill="#313244"/>
+  <circle cx="20" cy="17" r="6" fill="#f38ba8"/>
+  <circle cx="40" cy="17" r="6" fill="#f9e2af"/>
+  <circle cx="60" cy="17" r="6" fill="#a6e3a1"/>
+  <text x="390" y="22" fill="#a6adc8" text-anchor="middle" font-size="12">git cheat — de-para</text>
+
+  <!-- conteúdo -->
+  <g>
+    <!-- prompt -->
+    <text x="20" y="62"><tspan fill="#a6e3a1">$</tspan><tspan fill="#cdd6f4" xml:space="preserve"> git cheat stash</tspan></text>
+
+    <!-- seção -->
+    <text x="20" y="92" fill="#89dceb" font-weight="bold">▌ Stash</text>
+
+    <!-- linhas: alias (yel) / comando (grn) / descrição (dim) -->
+    <text x="32" y="116" fill="#f9e2af">s</text>
+    <text x="120" y="116" fill="#a6e3a1">git stash</text>
+    <text x="320" y="116" fill="#9399b2">guarda mudanças e limpa o working dir</text>
+    <text x="120" y="134" fill="#6c7086" xml:space="preserve">ex: git s</text>
+
+    <text x="32" y="158" fill="#f9e2af">-</text>
+    <text x="120" y="158" fill="#a6e3a1">git stash push -m "msg"</text>
+    <text x="320" y="158" fill="#9399b2">guarda com mensagem descritiva</text>
+    <text x="120" y="176" fill="#6c7086" xml:space="preserve">ex: git stash push -m "wip login"</text>
+
+    <text x="32" y="200" fill="#f9e2af">sp</text>
+    <text x="120" y="200" fill="#a6e3a1">git stash pop</text>
+    <text x="320" y="200" fill="#9399b2">aplica o último stash e remove da lista</text>
+    <text x="120" y="218" fill="#6c7086" xml:space="preserve">ex: git sp</text>
+
+    <text x="32" y="242" fill="#f9e2af">sl</text>
+    <text x="120" y="242" fill="#a6e3a1">git stash list</text>
+    <text x="320" y="242" fill="#9399b2">lista todos os stashes</text>
+    <text x="120" y="260" fill="#6c7086" xml:space="preserve">ex: git sl</text>
+
+    <text x="32" y="284" fill="#f9e2af">sc</text>
+    <text x="120" y="284" fill="#a6e3a1">git stash clear</text>
+    <text x="320" y="284" fill="#9399b2">remove todos os stashes</text>
+
+    <!-- dica -->
+    <text x="20" y="324"><tspan fill="#cdd6f4" font-weight="bold">Dica:</tspan><tspan fill="#9399b2" xml:space="preserve">  git cheat &lt;termo&gt;   filtra (ex: git cheat branch, git cheat stash)</tspan></text>
+  </g>
+</svg>

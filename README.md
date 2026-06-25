@@ -1,5 +1,10 @@
 # Setup Mac Dev — ambiente de terminal + Git
 
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Platform](https://img.shields.io/badge/platform-macOS-lightgrey.svg)
+![Shell](https://img.shields.io/badge/shell-zsh%20%2B%20bash-1f425f.svg)
+![Idempotent](https://img.shields.io/badge/idempotent-yes-success.svg)
+
 Script único e idempotente que replica todo o ambiente de terminal/Git em um Mac novo,
 do zero ao estado final: Oh My Zsh, plugins do Zsh, aliases do Git e uma "cola" de comandos.
 
@@ -63,6 +68,8 @@ Exemplos:
 ---
 
 ## A "cola" de comandos (de-para)
+
+![Demonstração do git cheat](assets/git-cheat-demo.svg)
 
 Depois de instalado:
 
