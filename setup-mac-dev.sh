@@ -50,7 +50,24 @@ for arg in "$@"; do
 done
 
 # ---------- helpers ----------
-c_b=$'\e[1m'; c_grn=$'\e[32m'; c_yel=$'\e[33m'; c_red=$'\e[31m'; c_rst=$'\e[0m'
+c_b=$'\e[1m'; c_grn=$'\e[32m'; c_yel=$'\e[33m'; c_red=$'\e[31m'; c_cyan=$'\e[36m'; c_dim=$'\e[2m'; c_rst=$'\e[0m'
+
+# total de etapas (8 base + opcionais), para o contador [n/N]
+TOTAL_STEPS=8
+[ "$SSH_KEY" -eq 1 ]       && TOTAL_STEPS=$((TOTAL_STEPS+1))
+[ "$CLEAN_BACKUPS" -eq 1 ] && TOTAL_STEPS=$((TOTAL_STEPS+1))
+STEP=0
+
+banner(){
+  printf "%s\n" "$c_cyan$c_b"
+  printf "   ┌─────────────────────────────────────────────┐\n"
+  printf "   │   setup-mac-dev  ·  ambiente de terminal/git  │\n"
+  printf "   └─────────────────────────────────────────────┘%s\n" "$c_rst"
+}
+step(){ # cabeçalho de etapa numerada
+  STEP=$((STEP+1))
+  printf "\n%s[%d/%d]%s %s%s%s\n" "$c_cyan$c_b" "$STEP" "$TOTAL_STEPS" "$c_rst" "$c_b" "$*" "$c_rst"
+}
 info(){ printf "%s==>%s %s\n" "$c_b" "$c_rst" "$*"; }
 ok(){   printf "  %s✓%s %s\n" "$c_grn" "$c_rst" "$*"; }
 warn(){ printf "  %s!%s %s\n" "$c_yel" "$c_rst" "$*"; }
@@ -71,8 +88,10 @@ ZSH_DIR="$HOME/.oh-my-zsh"
 ZSH_CUSTOM="${ZSH_CUSTOM:-$ZSH_DIR/custom}"
 ZSHRC="$HOME/.zshrc"
 
+banner
+
 # ---------- 0. pré-requisitos ----------
-info "Checando pré-requisitos"
+step "Checando pré-requisitos"
 command -v git  >/dev/null 2>&1 || { err "git não encontrado. Instale o Xcode Command Line Tools: xcode-select --install"; exit 1; }
 command -v curl >/dev/null 2>&1 || { err "curl não encontrado."; exit 1; }
 ok "git e curl presentes"
@@ -84,7 +103,7 @@ else
 fi
 
 # ---------- 1. Oh My Zsh ----------
-info "Instalando Oh My Zsh"
+step "Instalando Oh My Zsh"
 if [ -d "$ZSH_DIR" ]; then
   ok "já instalado ($ZSH_DIR)"
 else
@@ -94,7 +113,7 @@ else
 fi
 
 # ---------- 2. plugins externos ----------
-info "Instalando plugins"
+step "Instalando plugins"
 clone_plugin(){ # $1 = url, $2 = nome
   local dest="$ZSH_CUSTOM/plugins/$2"
   if [ -d "$dest" ]; then
@@ -110,7 +129,7 @@ clone_plugin https://github.com/zsh-users/zsh-syntax-highlighting  zsh-syntax-hi
 clone_plugin https://github.com/marlonrichert/zsh-autocomplete     zsh-autocomplete
 
 # ---------- 3. identidade git ----------
-info "Configurando identidade do Git"
+step "Configurando identidade do Git"
 GIT_NAME="${GIT_USER_NAME:-$(git config --global user.name 2>/dev/null || true)}"
 GIT_EMAIL="${GIT_USER_EMAIL:-$(git config --global user.email 2>/dev/null || true)}"
 if [ -z "$GIT_NAME" ];  then read -r -p "  Seu nome para os commits: " GIT_NAME; fi
@@ -119,7 +138,7 @@ ok "nome:  $GIT_NAME"
 ok "email: $GIT_EMAIL"
 
 # ---------- 4. ~/.gitconfig ----------
-info "Escrevendo ~/.gitconfig"
+step "Escrevendo ~/.gitconfig"
 backup "$HOME/.gitconfig"
 {
   printf '[user]\n\tname = %s\n\temail = %s\n' "$GIT_NAME" "$GIT_EMAIL"
@@ -257,7 +276,7 @@ GITCONFIG
 git config --global --list >/dev/null && ok "~/.gitconfig válido"
 
 # ---------- 5. ~/.gitignore global ----------
-info "Escrevendo ~/.gitignore global"
+step "Escrevendo ~/.gitignore global"
 backup "$HOME/.gitignore"
 cat > "$HOME/.gitignore" <<'GITIGNORE'
 # macOS
@@ -282,7 +301,7 @@ GITIGNORE
 ok "~/.gitignore criado"
 
 # ---------- 6. ~/.git-cheat.sh ----------
-info "Escrevendo ~/.git-cheat.sh (cola de-para)"
+step "Escrevendo ~/.git-cheat.sh (cola de-para)"
 backup "$HOME/.git-cheat.sh"
 cat > "$HOME/.git-cheat.sh" <<'CHEATSCRIPT'
 #!/usr/bin/env bash
@@ -403,7 +422,7 @@ chmod +x "$HOME/.git-cheat.sh"
 ok "~/.git-cheat.sh criado"
 
 # ---------- 7. ~/.zshrc ----------
-info "Configurando ~/.zshrc"
+step "Configurando ~/.zshrc"
 backup "$ZSHRC"
 # garante que o arquivo existe (caso KEEP_ZSHRC tenha preservado um vazio/inexistente)
 [ -f "$ZSHRC" ] || touch "$ZSHRC"
@@ -441,7 +460,7 @@ ok "bloco custom aplicado"
 
 # ---------- 8. chave SSH (opcional, --ssh-key) ----------
 if [ "$SSH_KEY" -eq 1 ]; then
-  info "Configurando chave SSH (ed25519)"
+  step "Configurando chave SSH (ed25519)"
   KEY="$HOME/.ssh/id_ed25519"
   mkdir -p "$HOME/.ssh"; chmod 700 "$HOME/.ssh"
   if [ -f "$KEY" ]; then
@@ -463,7 +482,7 @@ fi
 
 # ---------- 9. limpeza de backups (opcional) ----------
 if [ "$CLEAN_BACKUPS" -eq 1 ]; then
-  info "Limpando backups desta execução (--clean-backups)"
+  step "Limpando backups desta execução (--clean-backups)"
   if [ "${#BACKUPS[@]}" -eq 0 ]; then
     ok "nenhum backup foi gerado"
   else
@@ -472,11 +491,17 @@ if [ "$CLEAN_BACKUPS" -eq 1 ]; then
 fi
 
 # ---------- fim ----------
-echo
-info "${c_grn}Setup concluído!${c_rst}"
-echo "  Abra um terminal novo (ou rode: source ~/.zshrc) para ativar tudo."
-echo "  Teste:  git cheat        |  git cheat branch        |  gcheat stash"
+printf "\n%s%s   ✓ Setup concluído — %d/%d etapas%s\n" "$c_grn" "$c_b" "$STEP" "$TOTAL_STEPS" "$c_rst"
+printf "%s   ────────────────────────────────────%s\n" "$c_dim" "$c_rst"
+ok "Oh My Zsh + plugins (autosuggestions, syntax-highlighting, autocomplete)"
+ok "~/.gitconfig (identidade + aliases + git cheat)"
+ok "~/.gitignore global"
+ok "~/.git-cheat.sh (cola de-para)"
+ok "~/.zshrc configurado"
+[ "$SSH_KEY" -eq 1 ] && ok "chave SSH pronta (cadastre a pública mostrada acima)"
+printf "\n%sPróximo passo:%s abra um terminal novo (ou: %ssource ~/.zshrc%s)\n" "$c_b" "$c_rst" "$c_cyan" "$c_rst"
+printf "%sTeste:%s git cheat  ·  git cheat branch  ·  gcheat stash\n" "$c_b" "$c_rst"
 if [ "$NO_BACKUP" -eq 0 ] && [ "$CLEAN_BACKUPS" -eq 0 ] && [ "${#BACKUPS[@]}" -gt 0 ]; then
-  echo "  Backups criados (.bak.*). Para apagá-los depois: rode de novo com --clean-backups,"
-  echo "  ou: rm -f ~/.gitconfig.bak.* ~/.zshrc.bak.* ~/.gitignore.bak.* ~/.git-cheat.sh.bak.*"
+  printf "%sBackups:%s criados (.bak.*). Apagar depois: rode com --clean-backups,\n" "$c_dim" "$c_rst"
+  printf "         ou: rm -f ~/.gitconfig.bak.* ~/.zshrc.bak.* ~/.gitignore.bak.* ~/.git-cheat.sh.bak.*\n"
 fi
