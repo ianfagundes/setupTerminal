@@ -9,16 +9,19 @@ Arquivo: `setup-mac-dev.sh`
 
 ## Como usar
 
-1. Copie `setup-mac-dev.sh` para o Mac novo (AirDrop, pendrive, repositório, etc.).
-2. No Terminal, na pasta onde está o arquivo:
+No Mac novo:
 
-   ```sh
-   chmod +x setup-mac-dev.sh
-   ./setup-mac-dev.sh
-   ```
+```sh
+git clone https://github.com/ianfagundes/setupTerminal.git
+cd setupTerminal
+./setup-mac-dev.sh
+```
 
-3. Ele pede seu **nome** e **e-mail** do Git (única interação).
-4. Abra um **terminal novo** (ou rode `source ~/.zshrc`) para ativar tudo.
+> Se a máquina já tiver chave SSH cadastrada no GitHub, pode clonar via
+> `git clone git@github.com:ianfagundes/setupTerminal.git`.
+
+Ele pede seu **nome** e **e-mail** do Git (única interação). Ao final, abra um
+**terminal novo** (ou rode `source ~/.zshrc`) para ativar tudo.
 
 ### Modo 100% automático (sem perguntas)
 
@@ -30,6 +33,7 @@ GIT_USER_NAME="Seu Nome" GIT_USER_EMAIL="voce@email.com" ./setup-mac-dev.sh
 
 | Flag | O que faz |
 |------|-----------|
+| `--ssh-key` | gera uma chave SSH `ed25519` (se não existir), adiciona ao agent e mostra a pública para você cadastrar no GitHub |
 | `--no-backup` | não cria os arquivos `.bak.<timestamp>` ao sobrescrever |
 | `--clean-backups` | roda normalmente e, no final, **apaga** os backups gerados nesta execução |
 | `-h`, `--help` | mostra a ajuda |
@@ -39,6 +43,7 @@ Exemplos:
 ```sh
 ./setup-mac-dev.sh --no-backup        # nem cria backup
 ./setup-mac-dev.sh --clean-backups    # cria, usa e remove os backups ao terminar
+./setup-mac-dev.sh --ssh-key          # também gera/mostra a chave SSH p/ o GitHub
 ```
 
 ---
@@ -66,6 +71,22 @@ git cheat            # mostra todos os comandos: atalho -> comando real -> o que
 git cheat branch     # filtra por um termo
 git cheat stash
 gcheat push          # mesmo que `git cheat`, atalho de terminal
+```
+
+Saída (ex.: `git cheat stash`) — colorida no terminal:
+
+```text
+▌ Stash
+  s         git stash                                    guarda mudanças e limpa o working dir
+            ex: git s
+  -         git stash push -m "msg"                      guarda com mensagem descritiva
+            ex: git stash push -m "wip login"
+  sp        git stash pop                                aplica o último stash e remove da lista
+            ex: git sp
+  sl        git stash list                               lista todos os stashes
+            ex: git sl
+
+Dica:  git cheat <termo>   filtra (ex: git cheat branch, git cheat stash)
 ```
 
 ### Exemplos de atalhos do Git criados
@@ -99,7 +120,9 @@ gcheat push          # mesmo que `git cheat`, atalho de terminal
 ## O que o script NÃO faz
 
 - Não copia repositórios.
-- Não copia/gera chaves **SSH** (`~/.ssh`). No Mac novo, gere/transfira sua chave à parte:
+- Não cadastra chave **SSH** no GitHub por você. Mas com `--ssh-key` ele gera a chave
+  `ed25519` (se não houver), adiciona ao agent e imprime a pública pra você colar em
+  https://github.com/settings/ssh/new. Manualmente seria:
 
   ```sh
   ssh-keygen -t ed25519 -C "voce@email.com"
@@ -137,3 +160,9 @@ Cada execução gera backups com timestamp. Para voltar ao estado anterior, é s
 cp ~/.gitconfig.bak.<timestamp> ~/.gitconfig
 cp ~/.zshrc.bak.<timestamp> ~/.zshrc
 ```
+
+---
+
+## Licença
+
+[MIT](LICENSE) © Ian Fagundes

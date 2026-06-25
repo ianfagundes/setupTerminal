@@ -17,6 +17,8 @@
 #   GIT_USER_NAME="Seu Nome" GIT_USER_EMAIL="voce@email.com" ./setup-mac-dev.sh
 #
 # Flags:
+#   --ssh-key          gera uma chave SSH ed25519 (se não existir) e mostra a pública
+#                      para você cadastrar no GitHub
 #   --no-backup        não cria os arquivos .bak.<timestamp> ao sobrescrever
 #   --clean-backups    ao final, apaga os backups (.bak.*) gerados desta execução
 #   -h, --help         mostra esta ajuda
@@ -29,12 +31,14 @@ set -euo pipefail
 # ---------- flags ----------
 NO_BACKUP=0
 CLEAN_BACKUPS=0
+SSH_KEY=0
 usage(){
-  sed -n '2,21p' "$0" | sed 's/^#\{0,1\} \{0,1\}//'
+  sed -n '2,25p' "$0" | sed 's/^#\{0,1\} \{0,1\}//'
   exit "${1:-0}"
 }
 for arg in "$@"; do
   case "$arg" in
+    --ssh-key)       SSH_KEY=1 ;;
     --no-backup)     NO_BACKUP=1 ;;
     --clean-backups) CLEAN_BACKUPS=1 ;;
     -h|--help)       usage 0 ;;
@@ -431,7 +435,29 @@ alias gcheat="bash ~/.git-cheat.sh"
 ZBLOCK
 ok "bloco custom aplicado"
 
-# ---------- 8. limpeza de backups (opcional) ----------
+# ---------- 8. chave SSH (opcional, --ssh-key) ----------
+if [ "$SSH_KEY" -eq 1 ]; then
+  info "Configurando chave SSH (ed25519)"
+  KEY="$HOME/.ssh/id_ed25519"
+  mkdir -p "$HOME/.ssh"; chmod 700 "$HOME/.ssh"
+  if [ -f "$KEY" ]; then
+    ok "chave já existe ($KEY) — mantendo"
+  else
+    ssh-keygen -t ed25519 -C "$GIT_EMAIL" -f "$KEY" -N "" >/dev/null
+    ok "chave criada: $KEY"
+  fi
+  eval "$(ssh-agent -s)" >/dev/null 2>&1 || true
+  ssh-add "$KEY" >/dev/null 2>&1 || ssh-add --apple-use-keychain "$KEY" >/dev/null 2>&1 || true
+  echo
+  echo "  ${c_b}Cadastre esta chave pública no GitHub${c_rst} (Settings > SSH and GPG keys > New SSH key):"
+  echo "  https://github.com/settings/ssh/new"
+  echo
+  sed 's/^/    /' "$KEY.pub"
+  echo
+  echo "  Depois teste com:  ssh -T git@github.com"
+fi
+
+# ---------- 9. limpeza de backups (opcional) ----------
 if [ "$CLEAN_BACKUPS" -eq 1 ]; then
   info "Limpando backups desta execução (--clean-backups)"
   if [ "${#BACKUPS[@]}" -eq 0 ]; then
