@@ -1,5 +1,6 @@
 # Setup Mac Dev — ambiente de terminal + Git
 
+[![lint](https://github.com/ianfagundes/setupTerminal/actions/workflows/lint.yml/badge.svg)](https://github.com/ianfagundes/setupTerminal/actions/workflows/lint.yml)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Platform](https://img.shields.io/badge/platform-macOS-lightgrey.svg)
 ![Shell](https://img.shields.io/badge/shell-zsh%20%2B%20bash-1f425f.svg)

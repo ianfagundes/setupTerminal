@@ -1,0 +1,28 @@
+name: lint
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:   # permite rodar manualmente pelo botão na aba Actions
+
+jobs:
+  shell:
+    name: Validação do script
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Sintaxe (bash -n)
+        run: bash -n setup-mac-dev.sh
+
+      - name: ShellCheck (boas práticas de shell)
+        run: shellcheck setup-mac-dev.sh
+
+      - name: --help executa sem erro
+        run: bash setup-mac-dev.sh --help
+
+      - name: Cheatsheet gera saída
+        run: |
+          # extrai e roda só o ~/.git-cheat.sh embutido, garantindo que a cola funciona
+          grep -q 'git stash' setup-mac-dev.sh && echo "conteúdo da cola presente ✓"

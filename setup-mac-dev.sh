@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2088
+# (o "~" abaixo só aparece em mensagens exibidas ao usuário — ex.: ok "~/.gitconfig
+#  criado" — nunca como caminho passado a um comando, então o tilde não precisa expandir)
 #
 # setup-mac-dev.sh
 # Replica o ambiente de terminal/git do zero em um Mac novo:
@@ -56,7 +59,8 @@ BACKUPS=()  # caminhos dos backups criados nesta execução
 backup(){ # backup $1 se existir (respeita --no-backup)
   [ "$NO_BACKUP" -eq 1 ] && return 0
   if [ -e "$1" ]; then
-    local b="$1.bak.$(date +%Y%m%d%H%M%S)"
+    local b
+    b="$1.bak.$(date +%Y%m%d%H%M%S)"
     cp -p "$1" "$b"
     BACKUPS+=("$b")
     warn "backup: $b"
