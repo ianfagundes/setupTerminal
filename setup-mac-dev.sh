@@ -297,7 +297,19 @@ if command -v delta >/dev/null 2>&1; then
   git config --global delta.side-by-side true
   git config --global merge.conflictstyle zdiff3
   git config --global diff.colorMoved default
-  ok "delta configurado como pager de diff"
+  # tema de cores
+  git config --global delta.syntax-theme "Dracula"
+  # decorações coloridas (cabeçalhos de arquivo/commit/hunk + números de linha)
+  git config --global delta.file-style "bold yellow ul"
+  git config --global delta.file-decoration-style "yellow ul"
+  git config --global delta.hunk-header-decoration-style "cyan box ul"
+  git config --global delta.commit-decoration-style "bold magenta box ul"
+  git config --global delta.line-numbers-left-style "cyan"
+  git config --global delta.line-numbers-right-style "cyan"
+  # links clicáveis: abre o arquivo na linha exata no VS Code (terminal precisa suportar OSC 8)
+  git config --global delta.hyperlinks true
+  git config --global delta.hyperlinks-file-link-format "vscode://file/{path}:{line}"
+  ok "delta configurado (tema Dracula, side-by-side, links p/ VS Code)"
 else
   warn "delta não disponível — pager padrão do git mantido"
 fi
