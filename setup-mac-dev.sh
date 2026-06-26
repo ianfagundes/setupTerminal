@@ -294,7 +294,7 @@ if command -v delta >/dev/null 2>&1; then
   git config --global interactive.diffFilter "delta --color-only"
   git config --global delta.navigate true
   git config --global delta.line-numbers true
-  git config --global delta.side-by-side false
+  git config --global delta.side-by-side true
   git config --global merge.conflictstyle zdiff3
   git config --global diff.colorMoved default
   ok "delta configurado como pager de diff"
