@@ -7,7 +7,8 @@
 ![Idempotent](https://img.shields.io/badge/idempotent-yes-success.svg)
 
 Script único e idempotente que replica todo o ambiente de terminal/Git em um Mac novo,
-do zero ao estado final: Oh My Zsh, plugins do Zsh, aliases do Git e uma "cola" de comandos.
+do zero ao estado final: Oh My Zsh, plugins do Zsh, aliases do Git, git-delta (diff colorido
+com links pro VS Code) e uma "cola" de comandos.
 
 Arquivo: `setup-mac-dev.sh`
 
@@ -112,6 +113,49 @@ Dica:  git cheat <termo>   filtra (ex: git cheat branch, git cheat stash)
 | `git cheat` | — | abre a cola |
 
 > Lista completa: rode `git cheat`.
+
+---
+
+## git-delta — diff turbinado
+
+O [delta](https://github.com/dandavison/delta) substitui o pager padrão do Git e deixa
+`git diff`, `git show` e `git log -p` muito mais legíveis. O script instala (via Homebrew)
+e configura tudo automaticamente.
+
+O que vem ligado:
+
+| Recurso | Config | Efeito |
+|---------|--------|--------|
+| Tema de cores | `delta.syntax-theme = Dracula` | syntax highlight no diff |
+| Lado a lado | `delta.side-by-side = true` | antes \| depois em duas colunas |
+| Números de linha | `delta.line-numbers = true` | colunas de linha (em ciano) |
+| Navegação | `delta.navigate = true` | pula entre arquivos com `n` / `N` |
+| Links p/ editor | `delta.hyperlinks = true` | clicar no arquivo/linha abre no **VS Code** |
+| Conflitos | `merge.conflictstyle = zdiff3` | merge mais legível |
+
+### Abrir no VS Code ao clicar
+
+O link usa o formato `vscode://file/{path}:{line}` — clicar no nome do arquivo ou no número
+da linha abre o VS Code naquele ponto exato.
+
+> **Requer um terminal com suporte a OSC 8 hyperlinks**: iTerm2, WezTerm e kitty funcionam;
+> o **Terminal.app** padrão do macOS **não** (mostra o texto, mas não clica). As cores e o
+> side-by-side funcionam em qualquer terminal — só o clique depende disso.
+>
+> Não precisa do comando `code` no PATH: o link usa a URL `vscode://`, resolvida pelo macOS.
+
+### Ajustes rápidos
+
+```sh
+# trocar o tema (lista: delta --list-syntax-themes)
+git config --global delta.syntax-theme "Catppuccin Mocha"
+
+# desligar o lado a lado (volta ao diff unificado)
+git config --global delta.side-by-side false
+
+# ver um diff pontual em modo unificado, sem mudar a config
+git -c delta.side-by-side=false diff
+```
 
 ---
 
