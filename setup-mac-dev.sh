@@ -8,6 +8,7 @@
 #   - Oh My Zsh
 #   - plugins: git, zsh-autosuggestions, zsh-syntax-highlighting, zsh-autocomplete
 #   - ~/.zshrc configurado (plugins + autocomplete + alias gcheat + Ruby do Homebrew no PATH)
+#   - git-delta (diff com syntax highlight) + config no ~/.gitconfig
 #   - ~/.gitconfig (identidade + dezenas de aliases + alias `cheat`)
 #   - ~/.gitignore global
 #   - ~/.git-cheat.sh (cola de-para: `git cheat` / `gcheat`)
@@ -52,8 +53,8 @@ done
 # ---------- helpers ----------
 c_b=$'\e[1m'; c_grn=$'\e[32m'; c_yel=$'\e[33m'; c_red=$'\e[31m'; c_cyan=$'\e[36m'; c_dim=$'\e[2m'; c_rst=$'\e[0m'
 
-# total de etapas (8 base + opcionais), para o contador [n/N]
-TOTAL_STEPS=8
+# total de etapas (9 base + opcionais), para o contador [n/N]
+TOTAL_STEPS=9
 [ "$SSH_KEY" -eq 1 ]       && TOTAL_STEPS=$((TOTAL_STEPS+1))
 [ "$CLEAN_BACKUPS" -eq 1 ] && TOTAL_STEPS=$((TOTAL_STEPS+1))
 STEP=0
@@ -275,7 +276,33 @@ GITCONFIG
 } > "$HOME/.gitconfig"
 git config --global --list >/dev/null && ok "~/.gitconfig válido"
 
-# ---------- 5. ~/.gitignore global ----------
+# ---------- 5. git-delta (diff melhorado) ----------
+step "Instalando git-delta (diff bonito)"
+if ! command -v delta >/dev/null 2>&1; then
+  if command -v brew >/dev/null 2>&1; then
+    if brew install git-delta >/dev/null 2>&1; then
+      ok "git-delta instalado"
+    else
+      warn "falha ao instalar git-delta (siga sem ele)"
+    fi
+  else
+    warn "Homebrew ausente — pulando delta. Depois: brew install git-delta"
+  fi
+fi
+if command -v delta >/dev/null 2>&1; then
+  git config --global core.pager "delta"
+  git config --global interactive.diffFilter "delta --color-only"
+  git config --global delta.navigate true
+  git config --global delta.line-numbers true
+  git config --global delta.side-by-side false
+  git config --global merge.conflictstyle zdiff3
+  git config --global diff.colorMoved default
+  ok "delta configurado como pager de diff"
+else
+  warn "delta não disponível — pager padrão do git mantido"
+fi
+
+# ---------- 6. ~/.gitignore global ----------
 step "Escrevendo ~/.gitignore global"
 backup "$HOME/.gitignore"
 cat > "$HOME/.gitignore" <<'GITIGNORE'
@@ -300,7 +327,7 @@ DerivedData/
 GITIGNORE
 ok "~/.gitignore criado"
 
-# ---------- 6. ~/.git-cheat.sh ----------
+# ---------- 7. ~/.git-cheat.sh ----------
 step "Escrevendo ~/.git-cheat.sh (cola de-para)"
 backup "$HOME/.git-cheat.sh"
 cat > "$HOME/.git-cheat.sh" <<'CHEATSCRIPT'
@@ -421,7 +448,7 @@ CHEATSCRIPT
 chmod +x "$HOME/.git-cheat.sh"
 ok "~/.git-cheat.sh criado"
 
-# ---------- 7. ~/.zshrc ----------
+# ---------- 8. ~/.zshrc ----------
 step "Configurando ~/.zshrc"
 backup "$ZSHRC"
 # garante que o arquivo existe (caso KEEP_ZSHRC tenha preservado um vazio/inexistente)
@@ -458,7 +485,7 @@ alias gcheat="bash ~/.git-cheat.sh"
 ZBLOCK
 ok "bloco custom aplicado"
 
-# ---------- 8. chave SSH (opcional, --ssh-key) ----------
+# ---------- 9. chave SSH (opcional, --ssh-key) ----------
 if [ "$SSH_KEY" -eq 1 ]; then
   step "Configurando chave SSH (ed25519)"
   KEY="$HOME/.ssh/id_ed25519"
@@ -480,7 +507,7 @@ if [ "$SSH_KEY" -eq 1 ]; then
   echo "  Depois teste com:  ssh -T git@github.com"
 fi
 
-# ---------- 9. limpeza de backups (opcional) ----------
+# ---------- 10. limpeza de backups (opcional) ----------
 if [ "$CLEAN_BACKUPS" -eq 1 ]; then
   step "Limpando backups desta execução (--clean-backups)"
   if [ "${#BACKUPS[@]}" -eq 0 ]; then
@@ -495,6 +522,7 @@ printf "\n%s%s   ✓ Setup concluído — %d/%d etapas%s\n" "$c_grn" "$c_b" "$ST
 printf "%s   ────────────────────────────────────%s\n" "$c_dim" "$c_rst"
 ok "Oh My Zsh + plugins (autosuggestions, syntax-highlighting, autocomplete)"
 ok "~/.gitconfig (identidade + aliases + git cheat)"
+command -v delta >/dev/null 2>&1 && ok "git-delta (diff com syntax highlight)"
 ok "~/.gitignore global"
 ok "~/.git-cheat.sh (cola de-para)"
 ok "~/.zshrc configurado"

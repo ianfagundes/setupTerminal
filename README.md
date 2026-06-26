@@ -62,9 +62,10 @@ Exemplos:
 | 2 | **Oh My Zsh** | instalação unattended (pula se já existir) |
 | 3 | **Plugins Zsh** | `git`, `zsh-autosuggestions`, `zsh-syntax-highlighting`, `zsh-autocomplete` |
 | 4 | **`~/.gitconfig`** | identidade + dezenas de aliases + alias `cheat` |
-| 5 | **`~/.gitignore`** global | macOS / Xcode / editores |
-| 6 | **`~/.git-cheat.sh`** | cola de-para (`git cheat` / `gcheat`) |
-| 7 | **`~/.zshrc`** | linha `plugins=(...)` + bloco custom (autocomplete, Ruby no PATH, alias `gcheat`) |
+| 5 | **git-delta** | diff com syntax highlight, números de linha e navegação (`n`/`N`); vira o pager de diff |
+| 6 | **`~/.gitignore`** global | macOS / Xcode / editores |
+| 7 | **`~/.git-cheat.sh`** | cola de-para (`git cheat` / `gcheat`) |
+| 8 | **`~/.zshrc`** | linha `plugins=(...)` + bloco custom (autocomplete, Ruby no PATH, alias `gcheat`) |
 
 ---
 
