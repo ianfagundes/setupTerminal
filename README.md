@@ -1,105 +1,137 @@
-# Setup Mac Dev — ambiente de terminal + Git
+# setupTerminal — ambiente de terminal (macOS)
 
 [![lint](https://github.com/ianfagundes/setupTerminal/actions/workflows/lint.yml/badge.svg)](https://github.com/ianfagundes/setupTerminal/actions/workflows/lint.yml)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Platform](https://img.shields.io/badge/platform-macOS-lightgrey.svg)
-![Shell](https://img.shields.io/badge/shell-zsh%20%2B%20bash-1f425f.svg)
+![Shell](https://img.shields.io/badge/shell-zsh-1f425f.svg)
 ![Idempotent](https://img.shields.io/badge/idempotent-yes-success.svg)
 
-Script único e idempotente que replica todo o ambiente de terminal/Git em um Mac novo,
-do zero ao estado final: Oh My Zsh, plugins do Zsh, aliases do Git, git-delta (diff colorido
-com links pro VS Code) e uma "cola" de comandos.
+Dotfiles + `Brewfile` que reproduzem meu terminal do zero num Mac novo: **zsh + starship**,
+git-delta com diff **lado a lado tema Dracula** e clique-pra-abrir-no-VS-Code, mais um punhado
+de ferramentas modernas de CLI (`fzf`, `zoxide`, `eza`, `bat`, `fd`, `ripgrep`, `direnv`,
+`lazygit`) e uma "cola" de comandos git (`git cheat`).
 
-Arquivo: `setup-mac-dev.sh`
+Sem Oh My Zsh: a config vive num único `dev.zsh` rápido, versionado aqui.
 
 ---
 
 ## Como usar
 
-No Mac novo:
-
 ```sh
 git clone https://github.com/ianfagundes/setupTerminal.git
 cd setupTerminal
-./setup-mac-dev.sh
+./install.sh
 ```
 
-> Se a máquina já tiver chave SSH cadastrada no GitHub, pode clonar via
-> `git clone git@github.com:ianfagundes/setupTerminal.git`.
+O script instala o Homebrew (se faltar), roda `brew bundle`, pergunta **nome** e **e-mail**
+do git (única interação) e **linka** os dotfiles pra sua `~`. Ao final, abra um terminal novo
+(ou `source ~/.zshrc`).
 
-Ele pede seu **nome** e **e-mail** do Git (única interação). Ao final, abra um
-**terminal novo** (ou rode `source ~/.zshrc`) para ativar tudo.
-
-### Modo 100% automático (sem perguntas)
+### Sem perguntas
 
 ```sh
-GIT_USER_NAME="Seu Nome" GIT_USER_EMAIL="voce@email.com" ./setup-mac-dev.sh
+GIT_USER_NAME="Seu Nome" GIT_USER_EMAIL="voce@email.com" ./install.sh
 ```
 
 ### Flags
 
 | Flag | O que faz |
 |------|-----------|
-| `--ssh-key` | gera uma chave SSH `ed25519` (se não existir), adiciona ao agent e mostra a pública para você cadastrar no GitHub |
-| `--no-backup` | não cria os arquivos `.bak.<timestamp>` ao sobrescrever |
-| `--clean-backups` | roda normalmente e, no final, **apaga** os backups gerados nesta execução |
-| `-h`, `--help` | mostra a ajuda |
+| `--copy` | copia os dotfiles em vez de criar symlink |
+| `--ssh-key` | gera chave SSH `ed25519` (se não existir) e mostra a pública p/ cadastrar no GitHub |
+| `--no-backup` | não cria `.bak.<timestamp>` ao sobrescrever |
+| `--clean-backups` | apaga, ao final, os backups gerados nesta execução |
+| `-h`, `--help` | ajuda |
 
-Exemplos:
+---
+
+## Estrutura
+
+```
+setupTerminal/
+├── install.sh                 # instala brew tools + linka dotfiles (idempotente)
+├── Brewfile                   # ferramentas de CLI (brew bundle)
+└── dotfiles/
+    ├── zshrc                  # enxuto: só faz source do dev.zsh + ~/.zshrc.local
+    ├── gitconfig              # aliases + delta (Dracula) + cheat; identidade via include
+    ├── gitignore              # ignore global (macOS/Xcode/editores)
+    ├── git-cheat.sh           # cola de-para (git cheat / gcheat)
+    └── config/
+        ├── iterm2/dev.zsh     # o coração: history, completions, fzf, zoxide, aliases, funções
+        ├── starship.toml      # prompt
+        └── bat/config         # bat com tema Dracula
+```
+
+### Onde cada arquivo é linkado
+
+| Repo | Destino |
+|------|---------|
+| `dotfiles/gitconfig` | `~/.gitconfig` |
+| `dotfiles/zshrc` | `~/.zshrc` |
+| `dotfiles/gitignore` | `~/.gitignore` |
+| `dotfiles/git-cheat.sh` | `~/.git-cheat.sh` |
+| `dotfiles/config/iterm2/dev.zsh` | `~/.config/iterm2/dev.zsh` |
+| `dotfiles/config/starship.toml` | `~/.config/starship.toml` |
+| `dotfiles/config/bat/config` | `~/.config/bat/config` |
+
+---
+
+## Ferramentas (Brewfile)
+
+| Tool | Pra quê |
+|------|---------|
+| `starship` | prompt |
+| `git-delta` | diff turbinado (Dracula, side-by-side, links VS Code) |
+| `gh` | GitHub CLI (também é credential helper do git) |
+| `fzf` | fuzzy finder (Ctrl-T arquivos, Ctrl-R histórico, Alt-C dirs) |
+| `zoxide` | `cd` inteligente por frequência |
+| `eza` | `ls` moderno (ícones + git) |
+| `bat` | `cat` com syntax highlight (Dracula) |
+| `fd` / `ripgrep` | find/grep modernos |
+| `direnv` | `.envrc` por diretório |
+| `lazygit` | TUI de git (`lg`) |
+| `zsh-autosuggestions` / `zsh-syntax-highlighting` / `zsh-completions` | realce do zsh |
+
+---
+
+## git-delta — diff turbinado (tema Dracula)
+
+O [delta](https://github.com/dandavison/delta) substitui o pager do git e deixa `git diff`,
+`git show` e `git log -p` muito mais legíveis. Já vem ligado:
+
+| Recurso | Config | Efeito |
+|---------|--------|--------|
+| Tema | `delta.syntax-theme = Dracula` | syntax highlight roxo/rosa no diff |
+| Lado a lado | `delta.side-by-side = true` | antes \| depois em duas colunas |
+| Números de linha | `delta.line-numbers = true` | colunas de linha (ciano) |
+| Navegação | `delta.navigate = true` | pula entre arquivos com `n` / `N` |
+| Links p/ editor | `delta.hyperlinks = true` | clicar no arquivo/linha abre no **VS Code** |
+| Conflitos | `merge.conflictstyle = zdiff3` | merge mais legível |
+
+O clique usa `vscode://file/{path}:{line}` — abre o VS Code no ponto exato. Requer terminal
+com **OSC 8 hyperlinks** (iTerm2, WezTerm, kitty funcionam; Terminal.app não — mas cor e
+side-by-side funcionam em qualquer terminal).
 
 ```sh
-./setup-mac-dev.sh --no-backup        # nem cria backup
-./setup-mac-dev.sh --clean-backups    # cria, usa e remove os backups ao terminar
-./setup-mac-dev.sh --ssh-key          # também gera/mostra a chave SSH p/ o GitHub
+# trocar o tema (lista: delta --list-syntax-themes)
+git config --global delta.syntax-theme "Catppuccin Mocha"
+# desligar side-by-side pontualmente
+git -c delta.side-by-side=false diff
 ```
 
 ---
 
-## O que é instalado/configurado
-
-| # | Item | Detalhe |
-|---|------|---------|
-| 1 | Pré-requisitos | confere `git` e `curl`; avisa (sem travar) se faltar Homebrew |
-| 2 | **Oh My Zsh** | instalação unattended (pula se já existir) |
-| 3 | **Plugins Zsh** | `git`, `zsh-autosuggestions`, `zsh-syntax-highlighting`, `zsh-autocomplete` |
-| 4 | **`~/.gitconfig`** | identidade + dezenas de aliases + alias `cheat` |
-| 5 | **git-delta** | diff com syntax highlight (tema **Dracula**), side-by-side, números de linha, navegação (`n`/`N`) e **links clicáveis que abrem o arquivo no VS Code** na linha exata |
-| 6 | **`~/.gitignore`** global | macOS / Xcode / editores |
-| 7 | **`~/.git-cheat.sh`** | cola de-para (`git cheat` / `gcheat`) |
-| 8 | **`~/.zshrc`** | linha `plugins=(...)` + bloco custom (autocomplete, Ruby no PATH, alias `gcheat`) |
-
----
-
-## A "cola" de comandos (de-para)
+## A "cola" de comandos git (`git cheat`)
 
 ![Demonstração do git cheat](assets/git-cheat-demo.svg)
 
-Depois de instalado:
-
 ```sh
-git cheat            # mostra todos os comandos: atalho -> comando real -> o que faz -> exemplo
+git cheat            # todos os comandos: atalho -> comando real -> o que faz -> exemplo
 git cheat branch     # filtra por um termo
-git cheat stash
-gcheat push          # mesmo que `git cheat`, atalho de terminal
+gcheat push          # mesmo que git cheat, atalho de terminal
 ```
 
-Saída (ex.: `git cheat stash`) — colorida no terminal:
-
-```text
-▌ Stash
-  s         git stash                                    guarda mudanças e limpa o working dir
-            ex: git s
-  -         git stash push -m "msg"                      guarda com mensagem descritiva
-            ex: git stash push -m "wip login"
-  sp        git stash pop                                aplica o último stash e remove da lista
-            ex: git sp
-  sl        git stash list                               lista todos os stashes
-            ex: git sl
-
-Dica:  git cheat <termo>   filtra (ex: git cheat branch, git cheat stash)
-```
-
-### Exemplos de atalhos do Git criados
+Alguns atalhos criados no `gitconfig`:
 
 | Atalho | Comando | O que faz |
 |--------|---------|-----------|
@@ -108,111 +140,47 @@ Dica:  git cheat <termo>   filtra (ex: git cheat branch, git cheat stash)
 | `git graph` | `log --oneline --graph --all` | histórico visual |
 | `git swc <branch>` | `switch -c` | cria e troca de branch |
 | `git unstage <arq>` | `restore --staged` | tira do stage |
-| `git amend` | `commit --amend --no-edit` | junta mudança ao último commit |
+| `git amend` | `commit --amend --no-edit` | junta ao último commit |
 | `git pfl` | `push --force-with-lease` | force seguro |
-| `git cheat` | — | abre a cola |
 
-> Lista completa: rode `git cheat`.
+> Lista completa: `git cheat`.
 
 ---
 
-## git-delta — diff turbinado
+## Segredos e identidade (fora do git)
 
-O [delta](https://github.com/dandavison/delta) substitui o pager padrão do Git e deixa
-`git diff`, `git show` e `git log -p` muito mais legíveis. O script instala (via Homebrew)
-e configura tudo automaticamente.
+Este repo é público, então **nada de segredo entra aqui**:
 
-O que vem ligado:
+- **Identidade do git** (`user.name`/`user.email`) vai pra `~/.gitconfig.local`, escrito pelo
+  `install.sh` e incluído pelo `gitconfig` via `[include]`.
+- **API keys, tokens, completions de apps** vão pra `~/.zshrc.local`, que o `~/.zshrc` faz
+  `source` no final. Crie à mão:
 
-| Recurso | Config | Efeito |
-|---------|--------|--------|
-| Tema de cores | `delta.syntax-theme = Dracula` | syntax highlight no diff |
-| Lado a lado | `delta.side-by-side = true` | antes \| depois em duas colunas |
-| Números de linha | `delta.line-numbers = true` | colunas de linha (em ciano) |
-| Navegação | `delta.navigate = true` | pula entre arquivos com `n` / `N` |
-| Links p/ editor | `delta.hyperlinks = true` | clicar no arquivo/linha abre no **VS Code** |
-| Conflitos | `merge.conflictstyle = zdiff3` | merge mais legível |
+  ```sh
+  echo 'export MINHA_API_KEY="..."' >> ~/.zshrc.local
+  ```
 
-### Abrir no VS Code ao clicar
+---
 
-O link usa o formato `vscode://file/{path}:{line}` — clicar no nome do arquivo ou no número
-da linha abre o VS Code naquele ponto exato.
+## Idempotência e backup
 
-> **Requer um terminal com suporte a OSC 8 hyperlinks**: iTerm2, WezTerm e kitty funcionam;
-> o **Terminal.app** padrão do macOS **não** (mostra o texto, mas não clica). As cores e o
-> side-by-side funcionam em qualquer terminal — só o clique depende disso.
->
-> Não precisa do comando `code` no PATH: o link usa a URL `vscode://`, resolvida pelo macOS.
+- Rodar de novo só atualiza o que precisa; symlinks são recriados, não duplicados.
+- Arquivo real sobrescrito vira `arquivo.bak.<timestamp>` (a menos que `--no-backup`).
+- Symlink antigo é só removido (não vira backup).
 
-### Ajustes rápidos
+Restaurar:
 
 ```sh
-# trocar o tema (lista: delta --list-syntax-themes)
-git config --global delta.syntax-theme "Catppuccin Mocha"
-
-# desligar o lado a lado (volta ao diff unificado)
-git config --global delta.side-by-side false
-
-# ver um diff pontual em modo unificado, sem mudar a config
-git -c delta.side-by-side=false diff
+cp -a ~/.gitconfig.bak.<timestamp> ~/.gitconfig
 ```
-
----
-
-## Segurança e repetição
-
-- **Idempotente**: pode rodar várias vezes. A linha de `plugins=()` não se multiplica e o
-  bloco custom do `.zshrc` (entre os marcadores `# >>> dev-setup >>>` e `# <<< dev-setup <<<`)
-  é substituído, nunca duplicado.
-- **Backup automático**: tudo que é sobrescrito (`.gitconfig`, `.zshrc`, `.gitignore`,
-  `.git-cheat.sh`) vira `arquivo.bak.<timestamp>` antes de mudar.
-- **Não inclui o lazygit**.
 
 ---
 
 ## O que o script NÃO faz
 
 - Não copia repositórios.
-- Não cadastra chave **SSH** no GitHub por você. Mas com `--ssh-key` ele gera a chave
-  `ed25519` (se não houver), adiciona ao agent e imprime a pública pra você colar em
-  https://github.com/settings/ssh/new. Manualmente seria:
-
-  ```sh
-  ssh-keygen -t ed25519 -C "voce@email.com"
-  eval "$(ssh-agent -s)"
-  ssh-add ~/.ssh/id_ed25519
-  # depois adicione a chave pública (~/.ssh/id_ed25519.pub) no GitHub/GitLab/Azure
-  ```
-
-- Não instala o Homebrew automaticamente. Se faltar e você quiser o Ruby do Homebrew:
-
-  ```sh
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  brew install ruby
-  ```
-
----
-
-## Personalizar a cola
-
-Edite o bloco `DATA` dentro de `~/.git-cheat.sh`, no formato:
-
-```
-Seção|atalho|comando real|o que faz|exemplo de uso
-```
-
-Use `=` no campo do atalho quando o comando não tiver um atalho próprio.
-
----
-
-## Desfazer / restaurar
-
-Cada execução gera backups com timestamp. Para voltar ao estado anterior, é só restaurar:
-
-```sh
-cp ~/.gitconfig.bak.<timestamp> ~/.gitconfig
-cp ~/.zshrc.bak.<timestamp> ~/.zshrc
-```
+- Não cadastra a chave SSH no GitHub por você (`--ssh-key` gera e mostra a pública).
+- Não mexe em `~/.zshrc.local` (seus segredos).
 
 ---
 

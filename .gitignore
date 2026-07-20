@@ -1,1 +1,6 @@
 *.bak.*
+
+# segredos / identidade local — nunca versionar
+*.local
+.gitconfig.local
+.zshrc.local

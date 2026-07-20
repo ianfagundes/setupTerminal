@@ -1,0 +1,14 @@
+# ~/.zshrc — enxuto de propósito.
+# A configuração de verdade vive em ~/.config/iterm2/dev.zsh (versionada neste repo).
+# Segredos e ajustes só-desta-máquina vão em ~/.zshrc.local (NÃO versionar).
+
+if [[ -r "$HOME/.config/iterm2/dev.zsh" ]]; then
+  source "$HOME/.config/iterm2/dev.zsh"
+fi
+
+# ~/.local/bin no PATH (ferramentas instaladas pelo usuário)
+export PATH="$HOME/.local/bin:$PATH"
+
+# Overrides e segredos locais (API keys, tokens, completions de apps).
+# Crie este arquivo à mão; ele fica fora do git.
+[[ -r "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"

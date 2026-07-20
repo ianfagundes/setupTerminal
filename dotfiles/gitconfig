@@ -1,0 +1,170 @@
+# Git config — parte versionada do setup.
+# Identidade (user.name/email) NÃO fica aqui: vem de ~/.gitconfig.local,
+# escrito pelo install.sh, pra este arquivo poder ser público sem vazar nada.
+[include]
+	path = ~/.gitconfig.local
+
+[init]
+	defaultBranch = main
+[rerere]
+	enabled = 1
+	autoupdate = 1
+[core]
+	pager = delta
+	editor = vim
+	excludesfile = ~/.gitignore
+	whitespace = fix,-indent-with-non-tab,trailing-space,cr-at-eol
+	autocrlf = input
+[push]
+	default = simple
+[interactive]
+	diffFilter = delta --color-only
+[diff]
+	colorMoved = default
+[merge]
+	conflictstyle = zdiff3
+
+# git-delta: diff com syntax highlight (tema Dracula), lado a lado, números de
+# linha, navegação com n/N e links clicáveis que abrem o arquivo no VS Code.
+[delta]
+	navigate = true
+	side-by-side = true
+	line-numbers = true
+	syntax-theme = Dracula
+	file-style = bold yellow ul
+	file-decoration-style = yellow ul
+	hunk-header-decoration-style = cyan box ul
+	commit-decoration-style = bold magenta box ul
+	line-numbers-left-style = cyan
+	line-numbers-right-style = cyan
+	hyperlinks = true
+	hyperlinks-file-link-format = vscode://file/{path}:{line}
+
+[color]
+	ui = auto
+[color "branch"]
+	current = yellow bold
+	local = green bold
+	remote = cyan bold
+[color "diff"]
+	meta = yellow bold
+	frag = magenta bold
+	old = red bold
+	new = green bold
+	whitespace = red reverse
+[color "status"]
+	added = green bold
+	changed = yellow bold
+	untracked = red bold
+
+[credential "https://github.com"]
+	helper =
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !/opt/homebrew/bin/gh auth git-credential
+
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+
+[alias]
+	a = add --all
+	ai = add -i
+	ap = add -p
+	#############
+	reseta = reset HEAD^ --hard
+	b = branch
+	ba = branch -a
+	bd = branch -d
+	br = branch -r
+	#############
+	c = commit
+	ca = commit -a
+	co = checkout
+	cod = checkout --
+	cm = commit -m
+	cem = commit --allow-empty -m
+	cam = commit -am
+	cd = commit --amend
+	cad = commit -a --amend
+	ced = commit --allow-empty --amend
+	#############
+	d = diff
+	dc = diff --cached
+	dl = difftool
+	dlc = difftool --cached
+	dk = diff --check
+	dp = diff --patience
+	dck = diff --cached --check
+	#############
+	lg = log --oneline
+	l = log
+	lg2 = log --graph --branches=* --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+	#############
+	ps = push
+	psf = push -f
+	psu = push -u
+	pso = push origin
+	psao = push --all origin
+	psfo = push -f origin
+	psuo = push -u origin
+	psom = push origin master
+	psfom = push -f origin master
+	psuom = push -u origin master
+	#############
+	pl = pull
+	plu = pull -u
+	plo = pull origin
+	plp = pull upstream
+	plom = pull origin master
+	plpm = pull upstream master
+	#############
+	pr = pull --rebase
+	pbo = pull --rebase origin
+	pbp = pull --rebase upstream
+	pbom = pull --rebase origin master
+	pbpm = pull --rebase upstream master
+	#############
+	rb = rebase
+	re = reset
+	rev = revert --no-edit
+	rmpod = rm --cached Pods -r
+	#############
+	st = status
+	sb = status -s -b
+	#############
+	s  = stash
+	sa = stash apply
+	sc = stash clear
+	sd = stash drop
+	sl = stash list
+	sp = stash pop
+	ss = stash save
+	sw = stash show
+	#############
+	w = show
+	wp = show -p
+	wr = show -p --no-color
+	#### atalhos do guia (modernos / extras) ####
+	swi = switch
+	swc = switch -c
+	rst = restore
+	unstage = restore --staged
+	last = log -1 HEAD --stat
+	graph = log --oneline --graph --all --decorate
+	amend = commit --amend --no-edit
+	bdd = branch -D
+	rmrb = push origin --delete
+	pfl = push --force-with-lease
+	cont = rebase --continue
+	ref = reflog
+	remotes = remote -v
+	grp = grep -n
+	who = blame
+	contrib = shortlog -sn
+	cleann = clean -n
+	#### tooltip / de-para ####
+	cheat = "!bash ~/.git-cheat.sh"

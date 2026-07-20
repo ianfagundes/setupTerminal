@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# Xcode / iOS
+xcuserdata/
+*.xcuserstate
+DerivedData/
+*.moved-aside
+
+# Editores
+.idea/
+.vscode/
+*.swp
+*~
+
+# Node / envs
+node_modules/
+.env
+.env.local

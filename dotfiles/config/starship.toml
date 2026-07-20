@@ -1,0 +1,66 @@
+add_newline = true
+format = """
+$directory$git_branch$git_status$nodejs$python$package$docker_context$direnv$cmd_duration
+$character"""
+right_format = "$time"
+
+[character]
+success_symbol = "[>](bold green)"
+error_symbol = "[x](bold red)"
+vimcmd_symbol = "[<](bold yellow)"
+
+[directory]
+style = "bold cyan"
+truncation_length = 4
+truncate_to_repo = false
+read_only = " ro"
+format = "[$path]($style)[$read_only]($read_only_style) "
+
+[git_branch]
+style = "bold purple"
+format = "on [$branch]($style) "
+
+[git_status]
+style = "bold yellow"
+format = "([$all_status$ahead_behind]($style) )"
+conflicted = "!"
+ahead = "up${count}"
+behind = "down${count}"
+diverged = "up${ahead_count}/down${behind_count}"
+untracked = "?${count}"
+stashed = "$${count}"
+modified = "~${count}"
+staged = "+${count}"
+renamed = "r${count}"
+deleted = "-${count}"
+
+[nodejs]
+symbol = "node "
+format = "[$symbol($version)]($style) "
+
+[python]
+symbol = "py "
+format = "[${symbol}${pyenv_prefix}(${version})(\\($virtualenv\\))]($style) "
+
+[package]
+symbol = "pkg "
+format = "[$symbol$version]($style) "
+
+[docker_context]
+symbol = "docker "
+format = "[$symbol$context]($style) "
+
+[direnv]
+disabled = false
+format = "[$symbol$loaded/$allowed]($style) "
+symbol = "env "
+
+[cmd_duration]
+min_time = 1000
+format = "took [$duration]($style) "
+
+[time]
+disabled = false
+time_format = "%H:%M"
+style = "dimmed white"
+format = "[$time]($style)"
